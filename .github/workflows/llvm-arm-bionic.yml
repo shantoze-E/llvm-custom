@@ -20,13 +20,15 @@ permissions:
 jobs:
   build-and-release-llvm-armv7a:
     # Nama job dibuat lebih spesifik
-    name: Build and Release LLVM for armv7a
+    # Menggunakan nilai statis atau input karena env tidak tersedia di sini
+    name: Build and Release LLVM for armv7a (armv7a)
     runs-on: ubuntu-24.04
     env:
       # Target didefinisikan secara statis di sini
       TARGET: armv7a-linux-androideabi
       ANDROID_PLATFORM: 25
       ROOTDIR: ${{github.workspace}}
+      # TARGET_BUILD_DIR dan TARGET_INSTALL_DIR menggunakan variabel env, jadi ini OK
       TARGET_BUILD_DIR: ${{github.workspace}}/build/${{env.TARGET}}
       TARGET_INSTALL_DIR: ${{github.workspace}}/output/${{env.TARGET}}
       
@@ -277,9 +279,9 @@ jobs:
       - name: Compress
         run: |
           projects=$(echo "${{inputs.projects}}" | tr ";" "+")
-          tarball_name=${projects}-r${{inputs.ve-rsion}}-${{env.TARGET}}
+          tarball_name=${projects}-r${{inputs.version}}-${{env.TARGET}} # Perbaikan typo: inputs.ve-rsion menjadi inputs.version
           echo "tarball_name=${tarball_name}" >> ${GITHUB_ENV}
-          mv llvm-${{env.TARGET}} ${tarball_name}
+          mv llvm-${tarball_name} ${tarball_name} # Menggunakan variabel tarball_name yang sudah didefinisikan
           tar -c ${tarball_name} | xz -T0 -v >${tarball_name}.tar.xz
 
       - name: Upload release
